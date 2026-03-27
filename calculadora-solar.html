@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Calculadora Solar · Cuba</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{background:#0a0e14}input[type=range]{-webkit-appearance:auto;appearance:auto}</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+var h=React.createElement, us=React.useState, um=React.useMemo, ur=React.useRef;
+var dm="'DM Sans',sans-serif", sm="'Space Mono',monospace";
+
+// Lucide icon paths (from lucide.dev)
+var ICONS={
+  sun:"M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41M12 6a6 6 0 1 0 0 12 6 6 0 0 0 0-12z",
+  dollarSign:"M12 2v20m5-17H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H7",
+  layers:"M12.8 2.4a1.5 1.5 0 0 0-1.6 0L2 8l9.2 5.6a1.5 1.5 0 0 0 1.6 0L22 8zM2 12l9.2 5.6a1.5 1.5 0 0 0 1.6 0L22 12M2 16l9.2 5.6a1.5 1.5 0 0 0 1.6 0L22 16",
+  paintBucket:"m19 11-8-8-8.6 8.6a2 2 0 0 0 0 2.8l5.2 5.2a2 2 0 0 0 2.8 0L19 11zM5 2l5 5m-8 6h15m4 3a2 2 0 1 1-4 0c0-1.6 2-3 2-3s2 1.4 2 3z",
+  wallet:"M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1M3 5v14a2 2 0 0 0 2 2h15",
+  trophy:"M6 9H4.5a2.5 2.5 0 0 1 0-5H6m12 5h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16m-10-7.5V17c0 .55-.45 1-1 1H7m10-3.5V17c0 .55.45 1 1 1h2M8 2h8l-1 7a5 5 0 0 1-4.33 5A5 5 0 0 1 6.33 9z",
+  trendingUp:"M22 7l-8.5 8.5-5-5L2 17m20-10h-6v6",
+  barChart:"M12 20V10m6 10V4M6 20v-4",
+  table:"M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18",
+  wind:"M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2m14.1-8a2.5 2.5 0 1 1 1.8 4.3H2m8.4 10a2.5 2.5 0 1 0 1.8-4.3H2",
+  shield:"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z",
+  zap:"M13 2L3 14h9l-1 8 10-12h-9l1-8z",
+  compass:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 0v4m0 12v4M2 12h4m12 0h4",
+  alertTriangle:"M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01",
+  info:"M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 9v4m0-8h.01",
+  arrowDown:"M12 5v14m-7-7l7 7 7-7",
+  checkCircle:"M22 11.08V12a10 10 0 1 1-5.93-9.14M22 4L12 14.01l-3-3",
+  wrench:"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"
+};
+
+function Ic(name,size,color){
+  return h("svg",{width:size||16,height:size||16,viewBox:"0 0 24 24",fill:"none",stroke:color||"currentColor",strokeWidth:2,strokeLinecap:"round",strokeLinejoin:"round",style:{display:"inline-block",verticalAlign:"middle",marginRight:6,flexShrink:0}},
+    h("path",{d:ICONS[name]})
+  );
+}
+
+var BASE={label:"La Habana, Cuba (~22\u00b0N)",flatRatio:.853,slight15Ratio:.978,optimalAngle:20,slightAngle:15,ghiDaily:5.1,gtiOptDaily:5.98,source:"NASA POWER / profileSOLAR / Global Solar Atlas"};
+
+function azLoss(t,a){if(!t)return 1;var ar=Math.abs(a)*Math.PI/180,tr=t*Math.PI/180;return Math.max(.5,1-.62*Math.sin(tr)*(1-Math.cos(ar)))}
+function mBonus(a){return a>=0?0:Math.min(1,Math.abs(a)/90)*.015}
+
+var AZ=[{l:"N",v:180},{l:"NNE",v:-157.5},{l:"NE",v:-135},{l:"ENE",v:-112.5},{l:"E",v:-90},{l:"ESE",v:-67.5},{l:"SE",v:-45},{l:"SSE",v:-22.5},{l:"S",v:0},{l:"SSO",v:22.5},{l:"SO",v:45},{l:"OSO",v:67.5},{l:"O",v:90},{l:"ONO",v:112.5},{l:"NO",v:135},{l:"NNO",v:157.5}];
+
+function Sl(p){
+  return h("div",{style:{marginBottom:18}},
+    h("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:5}},
+      h("label",{style:{fontFamily:dm,fontSize:12,fontWeight:600,color:"#c4ccd8",letterSpacing:".03em",textTransform:"uppercase",display:"flex",alignItems:"center"}},p.icon?Ic(p.icon,14,p.color||"#c4ccd8"):null,p.label),
+      h("span",{style:{fontFamily:sm,fontSize:20,fontWeight:700,color:p.color||"#f0c040"}},typeof p.value==="number"&&p.value%1?p.value.toFixed(1):p.value,p.unit)
+    ),
+    p.sublabel?h("div",{style:{fontSize:11,color:"#7a8a9e",marginBottom:5,fontFamily:dm}},p.sublabel):null,
+    h("input",{type:"range",min:p.min,max:p.max,step:p.step,value:p.value,onChange:function(e){p.onChange(parseFloat(e.target.value))},style:{width:"100%",accentColor:p.color||"#f0c040",cursor:"pointer"}}),
+    h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:10,color:"#5a6a7e",fontFamily:sm,marginTop:2}},h("span",null,p.min,p.unit),h("span",null,p.max,p.unit))
+  );
+}
+
+function SC(p){
+  return h("div",{style:{background:p.winner?"linear-gradient(135deg,#1a2a18,#1e3320)":"linear-gradient(135deg,#141c28,#1a2438)",border:p.winner?"1px solid #3a7a30":"1px solid #2a3448",borderRadius:12,padding:"14px 16px",flex:1,minWidth:140,position:"relative",overflow:"hidden"}},
+    p.tag?h("div",{style:{position:"absolute",top:7,right:8,fontSize:8,fontWeight:700,background:p.winner?"#3a7a30":"#2a3a50",color:p.winner?"#c0f0b0":"#8a9aae",padding:"2px 7px",borderRadius:20,fontFamily:sm}},p.tag):null,
+    h("div",{style:{fontSize:10,color:"#7a8a9e",fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",fontFamily:dm,marginBottom:5}},p.label),
+    h("div",{style:{fontSize:22,fontWeight:700,color:p.accent||"#e8ecf0",fontFamily:sm,lineHeight:1.1}},p.value),
+    p.sub?h("div",{style:{fontSize:10,color:"#5a7a9e",marginTop:4,fontFamily:dm,lineHeight:1.3}},p.sub):null
+  );
+}
+
+function Comp(p){
+  var size=240,cx=120,cy=120,r=90;
+  var btns=AZ.map(function(opt){
+    var d=180+opt.v;if(d>=360)d-=360;
+    var rad=d*Math.PI/180,x=cx+r*Math.sin(rad),y=cy-r*Math.cos(rad);
+    var sel=p.value===opt.v,isS=Math.abs(opt.v)<=22.5;
+    return h("button",{key:opt.l,onClick:function(){p.onChange(opt.v)},style:{position:"absolute",left:x-17,top:y-13,width:34,height:26,background:sel?"#f0c040":"transparent",color:sel?"#0a0e14":isS?"#6aaa50":"#5a6a7e",border:sel?"2px solid #f0c040":"1px solid transparent",borderRadius:6,fontSize:opt.l.length<=2?11:8,fontWeight:sel?800:isS?600:400,fontFamily:sm,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",transition:"all .15s",zIndex:sel?10:1}},opt.l);
+  });
+  var cur=AZ.find(function(o){return o.v===p.value});
+  return h("div",{style:{display:"flex",flexDirection:"column",alignItems:"center",marginBottom:16}},
+    h("div",{style:{fontSize:12,fontWeight:600,color:"#c4ccd8",letterSpacing:".03em",textTransform:"uppercase",fontFamily:dm,marginBottom:10,alignSelf:"flex-start",display:"flex",alignItems:"center"}},Ic("compass",14,"#c4ccd8"),"Orientaci\u00f3n de los paneles"),
+    h("div",{style:{position:"relative",width:size,height:size}},
+      h("svg",{width:size,height:size,style:{position:"absolute",top:0,left:0}},
+        h("circle",{cx:cx,cy:cy,r:r+16,fill:"none",stroke:"#1e2a3c",strokeWidth:1}),
+        h("circle",{cx:cx,cy:cy,r:r-24,fill:"none",stroke:"#1a2438",strokeWidth:1,strokeDasharray:"2 4"}),
+        h("circle",{cx:cx,cy:cy+r+16,r:8,fill:"#3a7a30",opacity:.3})
+      ),
+      btns,
+      h("div",{style:{position:"absolute",top:cy-22,left:cx-44,width:88,height:44,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center"}},
+        h("div",{style:{fontSize:18,fontWeight:700,color:"#f0c040",fontFamily:sm}},cur?cur.l:""),
+        h("div",{style:{fontSize:9,color:"#5a6a7e",fontFamily:sm}},p.value===0?"al sur":Math.abs(p.value)+"\u00b0 "+(p.value<0?"E":"O")+" del S")
+      )
+    )
+  );
+}
+
+function Chart(p){
+  var W=660,H=220,pt=20,pr=20,pb=30,pl=55;
+  var cw=W-pl-pr,ch=H-pt-pb;
+  var data=p.data;if(!data||!data.length)return null;
+  var allY=[];p.lines.forEach(function(ln){data.forEach(function(d){allY.push(d[ln.key])})});
+  if(p.refLine)allY.push(p.refLine);
+  var yMax=Math.max.apply(null,allY)*1.1,xMin=data[0].panels,xMax=data[data.length-1].panels;
+  function sx(v){return pl+((v-xMin)/(xMax-xMin))*cw}
+  function sy(v){return pt+ch-(v/yMax)*ch}
+
+  var yTicks=[];var step=Math.pow(10,Math.floor(Math.log10(yMax||1)));
+  if(yMax/step<3)step/=2;if(yMax/step>8)step*=2;
+  for(var v=0;v<=yMax;v+=step)yTicks.push(Math.round(v*100)/100);
+
+  var hoverState=us(null),hover=hoverState[0],setHover=hoverState[1];
+  var ref=ur(null);
+  function onMouse(e){
+    var rect=ref.current&&ref.current.getBoundingClientRect();
+    if(!rect)return;var mx=e.clientX-rect.left;
+    var ratio=(mx/rect.width);var dataX=xMin+ratio*(xMax-xMin)*(W/(W));
+    // Adjust for padding
+    var pxInChart=(mx/rect.width)*W-pl;
+    var dIdx=Math.round((pxInChart/cw)*(xMax-xMin));
+    if(dIdx>=0&&dIdx<data.length)setHover(dIdx);else setHover(null);
+  }
+
+  var gridLines=yTicks.map(function(v){
+    return h("g",{key:v},
+      h("line",{x1:pl,y1:sy(v),x2:W-pr,y2:sy(v),stroke:"#1e2a3c",strokeDasharray:"3 3"}),
+      h("text",{x:pl-6,y:sy(v)+3,fill:"#5a6a7e",fontSize:9,fontFamily:sm,textAnchor:"end"},p.yFmt?p.yFmt(v):v)
+    );
+  });
+
+  var xLabels=data.filter(function(_,i){var step=Math.max(1,Math.floor(data.length/10));return i%step===0||i===data.length-1}).map(function(d){
+    return h("text",{key:d.panels,x:sx(d.panels),y:H-6,fill:"#5a6a7e",fontSize:9,fontFamily:sm,textAnchor:"middle"},d.panels);
+  });
+
+  var refEl=p.refLine?h("g",null,
+    h("line",{x1:pl,y1:sy(p.refLine),x2:W-pr,y2:sy(p.refLine),stroke:"#f0c040",strokeDasharray:"6 4",strokeWidth:1.5}),
+    h("text",{x:W-pr-4,y:sy(p.refLine)-5,fill:"#f0c040",fontSize:9,fontFamily:sm,textAnchor:"end"},"Presupuesto")
+  ):null;
+
+  var lineEls=p.lines.map(function(ln){
+    var pts=data.map(function(d){return sx(d.panels)+","+sy(d[ln.key])}).join(" ");
+    return h("polyline",{key:ln.key,points:pts,fill:"none",stroke:ln.color,strokeWidth:2.5});
+  });
+
+  var hoverEl=hover!==null&&hover<data.length?h("g",null,
+    h("line",{x1:sx(data[hover].panels),y1:pt,x2:sx(data[hover].panels),y2:pt+ch,stroke:"#ffffff22",strokeWidth:1}),
+    p.lines.map(function(ln){return h("circle",{key:ln.key,cx:sx(data[hover].panels),cy:sy(data[hover][ln.key]),r:4,fill:ln.color})})
+  ):null;
+
+  var tooltip=hover!==null&&hover<data.length?h("div",{style:{position:"absolute",top:10,right:10,background:"#1a2232",border:"1px solid #2a3a50",borderRadius:8,padding:"8px 12px",fontSize:11,color:"#c0cad4",fontFamily:dm}},
+    h("div",{style:{fontWeight:600,marginBottom:4}},data[hover].panels+" paneles"),
+    p.lines.map(function(ln){return h("div",{key:ln.key,style:{color:ln.color}},ln.name+": "+(p.yFmt?p.yFmt(data[hover][ln.key]):data[hover][ln.key].toFixed(1)))})
+  ):null;
+
+  return h("div",{style:{position:"relative"}},
+    h("svg",{ref:ref,viewBox:"0 0 "+W+" "+H,style:{width:"100%",height:"auto"},onMouseMove:onMouse,onMouseLeave:function(){setHover(null)}},gridLines,xLabels,refEl,lineEls,hoverEl),
+    tooltip
+  );
+}
+
+function App(){
+  var s1=us(140),panelCost=s1[0],setPanelCost=s1[1];
+  var s2=us(30),flatBaseCost=s2[0],setFlatBaseCost=s2[1];
+  var s3=us(90),fullTiltCost=s3[0],setFullTiltCost=s3[1];
+  var s4=us(1000),budget=s4[0],setBudget=s4[1];
+  var s5=us(0),azDev=s5[0],setAzDev=s5[1];
+  var s6=us(false),bifacial=s6[0],setBifacial=s6[1];
+  var s7=us(false),paintWhite=s7[0],setPaintWhite=s7[1];
+  var s8=us(10),paintCost=s8[0],setPaintCost=s8[1];
+
+  // Bifacial gain model:
+  // Gain = albedo * bifaciality_factor * view_factor
+  // bifaciality ~0.75, dark roof albedo ~0.2, white paint ~0.65
+  // view factor: flat on roof ~0.05 (almost nothing), tilted+elevated ~0.35
+  function bifacialGain(isTilted){
+    if(!bifacial) return 0;
+    var albedo=paintWhite?0.65:0.20;
+    var viewFactor=isTilted?0.35:0.05;
+    return albedo*0.75*viewFactor;
+  }
+
+  var calc=um(function(){
+    var azLabel=(AZ.find(function(o){return o.v===azDev})||{}).l||"";
+    var af20=azLoss(BASE.optimalAngle,azDev)+mBonus(azDev);
+    var flatR=BASE.flatRatio*(1+bifacialGain(false)),optR=Math.min(1,af20)*(1+bifacialGain(true));
+    var extraPaintCost=(bifacial&&paintWhite)?paintCost:0;
+    var flatTotal=panelCost+flatBaseCost+extraPaintCost,optTotal=panelCost+fullTiltCost+extraPaintCost;
+    var flatOPD=flatR/flatTotal,optOPD=optR/optTotal;
+    var nFlat=Math.floor(budget/flatTotal),nOpt=Math.floor(budget/optTotal);
+    var outFlat=nFlat*flatR,outOpt=nOpt*optR;
+    var spentFlat=nFlat*flatTotal,spentOpt=nOpt*optTotal;
+    var flatWins=outFlat>outOpt;
+    var advantage=flatWins?(outOpt>0?((outFlat/outOpt-1)*100):0):(outFlat>0?((outOpt/outFlat-1)*100):0);
+    var extraPanels=nFlat-nOpt;
+    var mp=Math.min(30,Math.max(20,nFlat+3,nOpt+3));
+    var chartData=[];for(var n=1;n<=mp;n++)chartData.push({panels:n,Plano_out:parseFloat((n*flatR).toFixed(3)),Plano_cost:n*flatTotal,Optimo_out:parseFloat((n*optR).toFixed(3)),Optimo_cost:n*optTotal});
+    var scF=flatR<optR?optR/(optR-flatR):Infinity;
+    return{flatR:flatR,optR:optR,flatTotal:flatTotal,optTotal:optTotal,flatOPD:flatOPD,optOPD:optOPD,flatWins:flatWins,advantage:advantage,nFlat:nFlat,nOpt:nOpt,outFlat:outFlat,outOpt:outOpt,spentFlat:spentFlat,spentOpt:spentOpt,extraPanels:extraPanels,chartData:chartData,scF:scF,azLabel:azLabel,azL20:Math.max(0,(1-af20)*100),bfFlat:bifacialGain(false)*100,bfOpt:bifacialGain(true)*100};
+  },[panelCost,flatBaseCost,fullTiltCost,budget,azDev,bifacial,paintWhite,paintCost]);
+
+  var flatWins=calc.flatWins,nFlat=calc.nFlat,nOpt=calc.nOpt,outFlat=calc.outFlat,outOpt=calc.outOpt;
+  var extraPct=outOpt>0?((outFlat/outOpt-1)*100).toFixed(0):"0";
+  var ep=calc.extraPanels;
+
+  // Build tilted config description
+  var tiltDesc="la base inclinada";
+  if(bifacial&&paintWhite) tiltDesc="la base inclinada, con paneles bifaciales y el piso pintado de blanco";
+  else if(bifacial) tiltDesc="la base inclinada con paneles bifaciales";
+  else if(paintWhite) tiltDesc="la base inclinada y el piso pintado de blanco";
+
+  var tiltDescShort="inclinados";
+  if(bifacial&&paintWhite) tiltDescShort="inclinados bifaciales + piso blanco";
+  else if(bifacial) tiltDescShort="inclinados bifaciales";
+
+  return h("div",{style:{minHeight:"100vh",background:"linear-gradient(170deg,#0a0e14,#0f1822 40%,#131a26)",color:"#e0e6ed",fontFamily:dm,padding:"20px 14px"}},
+    h("div",{style:{maxWidth:720,margin:"0 auto"}},
+
+      // Title question
+      h("div",{style:{textAlign:"center",marginBottom:24,padding:"24px 20px"}},
+        h("div",{style:{fontSize:10,fontWeight:700,color:"#f0c040",letterSpacing:".15em",textTransform:"uppercase",fontFamily:sm,marginBottom:10,display:"flex",alignItems:"center",justifyContent:"center",gap:6}},Ic("sun",14,"#f0c040"),"Calculadora Solar \u00b7 Cuba"),
+        h("h1",{style:{fontSize:28,fontWeight:800,color:"#f0f4f8",lineHeight:1.2,margin:0}},"\u00bfCon mi presupuesto, es mejor poner los paneles planos o inclinados?"),
+        h("p",{style:{fontSize:13,color:"#6a7a8e",marginTop:10,maxWidth:480,marginLeft:"auto",marginRight:"auto",lineHeight:1.4}},"Datos reales para "+BASE.label+". GHI = "+BASE.ghiDaily+" kWh/m\u00b2/d\u00eda, \u00f3ptimo "+BASE.optimalAngle+"\u00b0 S = "+BASE.gtiOptDaily+" kWh/m\u00b2/d\u00eda.")
+      ),
+
+      // Ratios
+      h("div",{style:{background:"#111820",border:"1px solid #1e2a3c",borderRadius:10,padding:"10px 16px",marginBottom:16}},
+        h("div",{style:{display:"flex",gap:20,flexWrap:"wrap",justifyContent:"center",fontSize:12,fontFamily:sm}},
+          h("span",null,h("span",{style:{color:"#60b8f0"}},"Plano 0\u00b0")," = ",h("span",{style:{color:"#e0e6ed"}},(calc.flatR*100).toFixed(1)+"%")),
+          h("span",null,h("span",{style:{color:"#f09060"}},BASE.optimalAngle+"\u00b0 "+calc.azLabel)," = ",h("span",{style:{color:"#e0e6ed"}},(calc.optR*100).toFixed(1)+"%"))
+        ),
+        bifacial?h("div",{style:{fontSize:10,color:"#8a7ab0",textAlign:"center",fontFamily:dm,marginTop:4}},"Ganancia bifacial: +"+calc.bfFlat.toFixed(1)+"% plano, +"+calc.bfOpt.toFixed(1)+"% inclinado"+(paintWhite?" (techo blanco)":" (techo oscuro)")):null,
+        azDev!==0?h("div",{style:{fontSize:10,color:"#5a6a7e",textAlign:"center",fontFamily:dm,marginTop:4}},"Penalizaci\u00f3n por azimut: "+calc.azL20.toFixed(1)+"% a "+BASE.optimalAngle+"\u00b0",azDev<0&&azDev>-90?h("span",{style:{color:"#6aaa50"}}," \u00b7 Bonus de sol matutino"):null):null
+      ),
+
+      // Controls
+      h("div",{style:{background:"linear-gradient(135deg,#111820,#151e2c)",border:"1px solid #1e2a3c",borderRadius:14,padding:"20px 20px 6px",marginBottom:16}},
+        h(Comp,{value:azDev,onChange:setAzDev}),
+        h(Sl,{label:"Costo de cada panel",value:panelCost,onChange:setPanelCost,min:50,max:800,step:10,unit:"$",icon:"dollarSign"}),
+
+        // Bifacial toggle
+        h("div",{style:{marginBottom:18}},
+          h("div",{style:{fontFamily:dm,fontSize:12,fontWeight:600,color:"#c4ccd8",letterSpacing:".03em",textTransform:"uppercase",marginBottom:8,display:"flex",alignItems:"center"}},Ic("layers",14,"#c4ccd8"),"Tipo de paneles"),
+          h("div",{style:{display:"flex",gap:8}},
+            h("button",{onClick:function(){setBifacial(false)},style:{flex:1,padding:"10px",borderRadius:8,border:!bifacial?"2px solid #f0c040":"1px solid #2a3448",background:!bifacial?"#f0c04018":"#0e1420",color:!bifacial?"#f0c040":"#5a6a7e",fontFamily:sm,fontSize:12,fontWeight:700,cursor:"pointer"}},"Monofaciales"),
+            h("button",{onClick:function(){setBifacial(true)},style:{flex:1,padding:"10px",borderRadius:8,border:bifacial?"2px solid #a070e0":"1px solid #2a3448",background:bifacial?"#a070e018":"#0e1420",color:bifacial?"#a070e0":"#5a6a7e",fontFamily:sm,fontSize:12,fontWeight:700,cursor:"pointer"}},"Bifaciales")
+          ),
+          bifacial?h("div",{style:{fontSize:10,color:"#8a7ab0",marginTop:6,fontFamily:dm}},"Los paneles bifaciales capturan luz por ambas caras. La ganancia depende de la luz reflejada por la superficie debajo."):null
+        ),
+
+        // Paint white toggle (only if bifacial)
+        bifacial?h("div",{style:{marginBottom:18}},
+          h("div",{style:{fontFamily:dm,fontSize:12,fontWeight:600,color:"#c4ccd8",letterSpacing:".03em",textTransform:"uppercase",marginBottom:8,display:"flex",alignItems:"center"}},Ic("paintBucket",14,"#c4ccd8"),"\u00bfPintar el techo de blanco?"),
+          h("div",{style:{display:"flex",gap:8}},
+            h("button",{onClick:function(){setPaintWhite(false)},style:{flex:1,padding:"10px",borderRadius:8,border:!paintWhite?"2px solid #f0c040":"1px solid #2a3448",background:!paintWhite?"#f0c04018":"#0e1420",color:!paintWhite?"#f0c040":"#5a6a7e",fontFamily:sm,fontSize:12,fontWeight:700,cursor:"pointer"}},"No pintar"),
+            h("button",{onClick:function(){setPaintWhite(true)},style:{flex:1,padding:"10px",borderRadius:8,border:paintWhite?"2px solid #e0e0e0":"1px solid #2a3448",background:paintWhite?"#e0e0e018":"#0e1420",color:paintWhite?"#e0e0e0":"#5a6a7e",fontFamily:sm,fontSize:12,fontWeight:700,cursor:"pointer"}},"Pintar blanco")
+          ),
+          paintWhite?h("div",{style:{fontSize:10,color:"#8a9aae",marginTop:6,fontFamily:dm}},"Albedo: techo oscuro \u2248 0.20, techo blanco \u2248 0.65. M\u00e1s reflexi\u00f3n = m\u00e1s ganancia bifacial."):null
+        ):null,
+
+        // Paint cost slider (only if bifacial AND paint white)
+        bifacial&&paintWhite?h(Sl,{label:"Costo de pintura blanca por panel",value:paintCost,onChange:setPaintCost,min:0,max:200,step:1,unit:"$",color:"#e0e0e0",sublabel:"Pintura del \u00e1rea debajo de cada panel \u2014 por panel",icon:"paintBucket"}):null,
+        h(Sl,{label:"Costo de base plana por panel",value:flatBaseCost,onChange:setFlatBaseCost,min:0,max:200,step:5,unit:"$",color:"#60b8f0",sublabel:"Bloques de lastre, gomas \u2014 por panel",icon:"wrench"}),
+        h(Sl,{label:"Costo base con inclinaci\u00f3n por panel",value:fullTiltCost,onChange:setFullTiltCost,min:0,max:200,step:5,unit:"$",color:"#f09060",sublabel:"Estructura completa a "+BASE.optimalAngle+"\u00b0 \u2014 por panel",icon:"wrench"})
+      ),
+
+      // Budget
+      h("div",{style:{background:"linear-gradient(135deg,#111820,#151e2c)",border:"1px solid #2a3a20",borderRadius:14,padding:"20px 20px 10px",marginBottom:16}},
+        h(Sl,{label:"Presupuesto total",value:budget,onChange:setBudget,min:100,max:20000,step:50,unit:"$",icon:"wallet"}),
+        h("div",{style:{display:"flex",gap:10,marginBottom:10}},
+          h("div",{style:{flex:1,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #60b8f033"}},
+            h("div",{style:{fontSize:9,color:"#60b8f0",fontWeight:600,fontFamily:sm,marginBottom:3,display:"flex",alignItems:"center"}},Ic("arrowDown",12,"#60b8f0"),"PLANO"),
+            h("div",{style:{fontSize:18,fontWeight:700,color:"#e0e6ed",fontFamily:sm}},nFlat," ",h("span",{style:{fontSize:10,color:"#5a6a7e"}},"paneles")),
+            h("div",{style:{fontSize:10,color:"#5a6a7e"}},"$"+calc.spentFlat+" gastados \u00b7 "+outFlat.toFixed(1)+" producci\u00f3n")
+          ),
+          h("div",{style:{flex:1,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #f0906033"}},
+            h("div",{style:{fontSize:9,color:"#f09060",fontWeight:600,fontFamily:sm,marginBottom:3,display:"flex",alignItems:"center"}},Ic("trendingUp",12,"#f09060"),"INCLINADO "+BASE.optimalAngle+"\u00b0"),
+            h("div",{style:{fontSize:18,fontWeight:700,color:"#e0e6ed",fontFamily:sm}},nOpt," ",h("span",{style:{fontSize:10,color:"#5a6a7e"}},"paneles")),
+            h("div",{style:{fontSize:10,color:"#5a6a7e"}},"$"+calc.spentOpt+" gastados \u00b7 "+outOpt.toFixed(1)+" producci\u00f3n")
+          )
+        )
+      ),
+
+      // Verdict - hot claim
+      h("div",{style:{background:flatWins?"linear-gradient(135deg,#1a3018,#2a4a20 50%,#1a3018)":"linear-gradient(135deg,#2a1a18,#4a2a20 50%,#2a1a18)",border:flatWins?"2px solid #4a8a30":"2px solid #8a4a30",borderRadius:16,padding:"24px 28px",marginBottom:12,textAlign:"center"}},
+        h("div",{style:{fontSize:26,fontWeight:800,color:"#f0f4f8",lineHeight:1.2,marginBottom:8,display:"flex",alignItems:"center",justifyContent:"center",gap:8}},Ic(flatWins?"checkCircle":"trophy",24,flatWins?"#a0d860":"#f0c040"),flatWins?"Ah\u00f3rrate la base inclinada":"Invierte en "+tiltDesc),
+        h("div",{style:{fontSize:15,fontWeight:400,color:flatWins?"#b0d8a0":"#e0b090",lineHeight:1.4}},
+          flatWins?(ep>0?"Con el mismo presupuesto puedes poner "+ep+" panel"+(ep>1?"es":"")+" horizontal"+(ep>1?"es":"")+" m\u00e1s y lograr un "+extraPct+"% m\u00e1s de producci\u00f3n":"Los paneles horizontales generan m\u00e1s producci\u00f3n total con tu presupuesto")
+          :"La inclinaci\u00f3n"+(bifacial?" con paneles bifaciales":"")+(bifacial&&paintWhite?" y el piso pintado de blanco":paintWhite?" con el piso pintado de blanco":"")+" produce un "+((outOpt/outFlat-1)*100).toFixed(0)+"% m\u00e1s con tu presupuesto"
+        )
+      ),
+
+      // Space constraint note (only when flat wins with more panels)
+      flatWins&&nFlat>nOpt?h("div",{style:{background:"#111820",border:"1px solid #1e2a3c",borderRadius:10,padding:"10px 16px",marginBottom:18,textAlign:"center"}},
+        h("div",{style:{fontSize:12,color:"#8a9aae",lineHeight:1.5,fontFamily:dm}},
+          Ic("alertTriangle",14,"#c4ccd8"),h("strong",{style:{color:"#c4ccd8"}},"Nota:")," Esta conclusi\u00f3n asume que tienes espacio disponible en el techo para paneles adicionales. Si tu espacio es limitado y no caben m\u00e1s paneles, lo m\u00e1s eficiente es ",h("strong",{style:{color:"#f09060"}},"inclinar los que tengas")," para maximizar la producci\u00f3n por panel."
+        )
+      ):null,
+
+      // Cards with prominent savings
+      h("div",{style:{display:"flex",gap:10,marginBottom:16,flexWrap:"wrap"}},
+        h("div",{style:{background:flatWins?"linear-gradient(135deg,#1a2a18,#1e3320)":"linear-gradient(135deg,#141c28,#1a2438)",border:flatWins?"1px solid #3a7a30":"1px solid #2a3448",borderRadius:12,padding:"14px 16px",flex:1,minWidth:140,position:"relative"}},
+          flatWins?h("div",{style:{position:"absolute",top:7,right:8,fontSize:8,fontWeight:700,background:"#3a7a30",color:"#c0f0b0",padding:"2px 7px",borderRadius:20,fontFamily:sm}},"M\u00c1S PRODUCCI\u00d3N"):null,
+          h("div",{style:{fontSize:10,color:"#7a8a9e",fontWeight:600,textTransform:"uppercase",fontFamily:dm,marginBottom:5,display:"flex",alignItems:"center"}},Ic("arrowDown",12,"#60b8f0"),"Plano (0\u00b0)"),
+          h("div",{style:{fontSize:28,fontWeight:700,color:"#60b8f0",fontFamily:sm,lineHeight:1.1}},nFlat,h("span",{style:{fontSize:13,color:"#5a6a7e"}}," paneles")),
+          h("div",{style:{fontSize:13,color:"#e0e6ed",fontFamily:sm,marginTop:6}},"Producci\u00f3n: ",h("strong",null,outFlat.toFixed(1))),
+          h("div",{style:{fontSize:13,color:"#e0e6ed",fontFamily:sm,marginTop:2}},"Gasto: ",h("strong",null,"$"+calc.spentFlat)),
+          h("div",{style:{fontSize:13,color:"#8a9aae",fontFamily:sm,marginTop:2}},"Costo/panel: $"+calc.flatTotal)
+        ),
+        h("div",{style:{background:!flatWins?"linear-gradient(135deg,#1a2a18,#1e3320)":"linear-gradient(135deg,#141c28,#1a2438)",border:!flatWins?"1px solid #3a7a30":"1px solid #2a3448",borderRadius:12,padding:"14px 16px",flex:1,minWidth:140,position:"relative"}},
+          !flatWins?h("div",{style:{position:"absolute",top:7,right:8,fontSize:8,fontWeight:700,background:"#3a7a30",color:"#c0f0b0",padding:"2px 7px",borderRadius:20,fontFamily:sm}},"M\u00c1S PRODUCCI\u00d3N"):null,
+          h("div",{style:{fontSize:10,color:"#7a8a9e",fontWeight:600,textTransform:"uppercase",fontFamily:dm,marginBottom:5,display:"flex",alignItems:"center"}},Ic("trendingUp",12,"#f09060"),"Inclinado ("+BASE.optimalAngle+"\u00b0)"),
+          h("div",{style:{fontSize:28,fontWeight:700,color:"#f09060",fontFamily:sm,lineHeight:1.1}},nOpt,h("span",{style:{fontSize:13,color:"#5a6a7e"}}," paneles")),
+          h("div",{style:{fontSize:13,color:"#e0e6ed",fontFamily:sm,marginTop:6}},"Producci\u00f3n: ",h("strong",null,outOpt.toFixed(1))),
+          h("div",{style:{fontSize:13,color:"#e0e6ed",fontFamily:sm,marginTop:2}},"Gasto: ",h("strong",null,"$"+calc.spentOpt)),
+          h("div",{style:{fontSize:13,color:"#8a9aae",fontFamily:sm,marginTop:2}},"Costo/panel: $"+calc.optTotal)
+        )
+      ),
+
+      // Conclusion - single unified statement
+      (function(){
+        var prodPct=flatWins?(outOpt>0?((outFlat/outOpt-1)*100).toFixed(0):"0"):(outFlat>0?((outOpt/outFlat-1)*100).toFixed(0):"0");
+        var saveDiff=Math.abs(calc.spentFlat-calc.spentOpt);
+        var msg;
+        if(flatWins){
+          if(nFlat>nOpt){
+            msg="Con tu presupuesto: "+nFlat+" planos producen "+prodPct+"% m\u00e1s que "+nOpt+" "+tiltDescShort;
+            if(calc.spentFlat<calc.spentOpt) msg+=", y adem\u00e1s te ahorras $"+saveDiff;
+          } else {
+            msg="Con la misma cantidad de paneles, los planos generan m\u00e1s producci\u00f3n total con tu presupuesto";
+            if(calc.spentFlat<calc.spentOpt) msg+=", y adem\u00e1s te ahorras $"+saveDiff;
+          }
+        } else {
+          if(nOpt<nFlat){
+            msg="Con tu presupuesto: "+nOpt+" "+tiltDescShort+" producen "+prodPct+"% m\u00e1s que "+nFlat+" planos, aunque son "+(nFlat-nOpt)+" panel"+(nFlat-nOpt>1?"es":"")+" menos";
+            if(calc.spentOpt<calc.spentFlat) msg+=", y adem\u00e1s te ahorras $"+saveDiff;
+          } else {
+            msg="Con tu presupuesto: "+nOpt+" "+tiltDescShort+" producen "+prodPct+"% m\u00e1s que "+nFlat+" planos";
+            if(calc.spentOpt<calc.spentFlat) msg+=", y adem\u00e1s te ahorras $"+saveDiff;
+          }
+        }
+        return h("div",{style:{background:"#111820",border:"1px solid #1e2a3c",borderRadius:12,padding:"16px 18px",marginBottom:16,textAlign:"center"}},
+          h("div",{style:{fontSize:16,fontWeight:600,color:"#f0c040",fontFamily:dm,lineHeight:1.4,display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}},Ic("zap",18,"#f0c040"),msg)
+        );
+      })(),
+
+      // Bars
+      h("div",{style:{background:"#111820",border:"1px solid #1e2a3c",borderRadius:12,padding:"14px 18px",marginBottom:16}},
+        h("div",{style:{fontSize:11,fontWeight:700,color:"#7a8a9e",textTransform:"uppercase",letterSpacing:".06em",fontFamily:sm,marginBottom:10,display:"flex",alignItems:"center"}},Ic("barChart",14,"#7a8a9e"),"Producci\u00f3n por d\u00f3lar gastado"),
+        [{n:"Plano (0\u00b0)",opd:calc.flatOPD,c:"#60b8f0"},{n:"Inclinado ("+BASE.optimalAngle+"\u00b0)",opd:calc.optOPD,c:"#f09060"}].map(function(x){
+          var mx=Math.max(calc.flatOPD,calc.optOPD);
+          return h("div",{key:x.n,style:{marginBottom:8}},
+            h("div",{style:{display:"flex",justifyContent:"space-between",fontSize:11,marginBottom:3}},
+              h("span",{style:{color:x.c,fontWeight:600}},x.n),
+              h("span",{style:{color:"#c0cad4",fontFamily:sm,fontWeight:700}},(x.opd*1000).toFixed(2))
+            ),
+            h("div",{style:{background:"#1a2438",borderRadius:4,height:8,overflow:"hidden"}},
+              h("div",{style:{width:(x.opd/mx*100)+"%",height:"100%",borderRadius:4,background:"linear-gradient(90deg,"+x.c+"88,"+x.c+")",transition:"width .3s"}})
+            )
+          );
+        }),
+        h("div",{style:{fontSize:9,color:"#4a5a6e",marginTop:6}},"Valores \u00d71000. Mayor = mejor.")
+      ),
+
+      // Chart cost
+      h("div",{style:{background:"linear-gradient(135deg,#111820,#151e2c)",border:"1px solid #1e2a3c",borderRadius:14,padding:"18px 14px 10px",marginBottom:16}},
+        h("div",{style:{fontSize:11,fontWeight:700,color:"#7a8a9e",textTransform:"uppercase",letterSpacing:".06em",fontFamily:sm,marginBottom:4,display:"flex",alignItems:"center"}},Ic("trendingUp",14,"#7a8a9e"),"Costo total por cantidad de paneles"),
+        h("div",{style:{fontSize:10,color:"#5a6a7e",fontFamily:dm,marginBottom:10}},"Donde la l\u00ednea cruza tu presupuesto, ah\u00ed se acaban tus paneles."),
+        h(Chart,{data:calc.chartData,lines:[{key:"Plano_cost",name:"Plano",color:"#60b8f0"},{key:"Optimo_cost",name:"Inclinado "+BASE.optimalAngle+"\u00b0",color:"#f09060"}],yFmt:function(v){return"$"+v},refLine:budget})
+      ),
+
+      // Table
+      h("div",{style:{background:"linear-gradient(135deg,#111820,#151e2c)",border:"1px solid #1e2a3c",borderRadius:14,padding:"18px 14px",marginBottom:20,overflowX:"auto"}},
+        h("div",{style:{fontSize:11,fontWeight:700,color:"#7a8a9e",textTransform:"uppercase",letterSpacing:".06em",fontFamily:sm,marginBottom:10,display:"flex",alignItems:"center"}},Ic("table",14,"#7a8a9e"),"Comparaci\u00f3n detallada"),
+        h("table",{style:{width:"100%",borderCollapse:"collapse",fontFamily:sm,fontSize:11}},
+          h("thead",null,h("tr",{style:{borderBottom:"1px solid #2a3448"}},
+            h("th",{style:{padding:"6px 4px",textAlign:"left",color:"#5a6a7e",fontSize:9}},"N"),
+            h("th",{style:{padding:"6px 6px",textAlign:"right",color:"#60b8f0",fontSize:9}},"Plano $"),
+            h("th",{style:{padding:"6px 6px",textAlign:"right",color:"#60b8f0",fontSize:9}},"Prod"),
+            h("th",{style:{padding:"6px 6px",textAlign:"right",color:"#f09060",fontSize:9,borderLeft:"1px solid #1a2438"}},"Incl. $"),
+            h("th",{style:{padding:"6px 6px",textAlign:"right",color:"#f09060",fontSize:9}},"Prod"),
+            h("th",{style:{padding:"6px 4px",textAlign:"right",color:"#f0c040",fontSize:9}},"Mejor")
+          )),
+          h("tbody",null,calc.chartData.slice(0,20).map(function(row){
+            var fW=row.Plano_out/row.Plano_cost>row.Optimo_out/row.Optimo_cost;
+            var inB=row.Plano_cost<=budget||row.Optimo_cost<=budget;
+            return h("tr",{key:row.panels,style:{borderBottom:"1px solid #141e2c",opacity:inB?1:.35}},
+              h("td",{style:{padding:"5px 4px",color:"#8a9aae"}},row.panels),
+              h("td",{style:{padding:"5px 6px",textAlign:"right",color:row.Plano_cost<=budget?"#8a9aae":"#3a4a5e",fontSize:10}},"$"+row.Plano_cost),
+              h("td",{style:{padding:"5px 6px",textAlign:"right",color:row.Plano_cost<=budget?"#60b8f0":"#3a4a5e",fontSize:10}},row.Plano_out.toFixed(1)),
+              h("td",{style:{padding:"5px 6px",textAlign:"right",color:row.Optimo_cost<=budget?"#8a9aae":"#3a4a5e",fontSize:10,borderLeft:"1px solid #141e2c"}},"$"+row.Optimo_cost),
+              h("td",{style:{padding:"5px 6px",textAlign:"right",color:row.Optimo_cost<=budget?"#f09060":"#3a4a5e",fontSize:10}},row.Optimo_out.toFixed(1)),
+              h("td",{style:{padding:"5px 4px",textAlign:"right",color:fW?"#60b8f0":"#f09060",fontWeight:700,fontSize:9}},fW?"Plano":"Incl.")
+            );
+          }))
+        )
+      ),
+
+      // Azimuth insight
+      azDev!==0?h("div",{style:{background:"linear-gradient(135deg,#1a2a18,#1e3320)",border:"1px solid #2a4a20",borderRadius:14,padding:"16px 20px",marginBottom:18}},
+        h("div",{style:{fontSize:12,fontWeight:700,color:"#a0d860",fontFamily:sm,marginBottom:6,display:"flex",alignItems:"center"}},Ic("compass",14,"#a0d860"),"Orientado al "+calc.azLabel+" \u2014 "+Math.abs(azDev)+"\u00b0 del sur"),
+        h("div",{style:{fontSize:13,color:"#c0d8c0",lineHeight:1.5}},
+          "Los paneles planos ",h("strong",{style:{color:"#e0f0d0"}},"no se ven afectados")," por el azimut \u2014 ven todo el cielo por igual. Los inclinados hacia el "+calc.azLabel+" pierden "+calc.azL20.toFixed(1)+"% vs sur.",
+          azDev<0&&azDev>-90?" Las nubes tropicales de la tarde dan un peque\u00f1o bonus de sol matutino al este.":null,
+          Math.abs(azDev)>=90?" Con esta orientaci\u00f3n, inclinar ayuda mucho menos \u2014 el plano se vuelve muy competitivo.":null
+        )
+      ):null,
+
+      // Bifacial explanation
+      h("div",{style:{background:"linear-gradient(135deg,#1a1828,#1e1e30)",border:"1px solid #2a2848",borderRadius:14,padding:"16px 20px",marginBottom:18}},
+        h("div",{style:{fontSize:12,fontWeight:700,color:"#a070e0",fontFamily:sm,marginBottom:8,display:"flex",alignItems:"center"}},Ic("layers",14,"#a070e0"),"\u00bfC\u00f3mo influyen los paneles bifaciales?"),
+        h("div",{style:{fontSize:13,color:"#a0a0c0",lineHeight:1.6}},
+          "Un panel bifacial tiene c\u00e9lulas solares en ",h("strong",{style:{color:"#e0e0f0"}},"ambas caras"),". La cara trasera captura la luz que rebota del suelo o techo debajo del panel. La ganancia depende de dos factores:"
+        ),
+        h("div",{style:{display:"flex",gap:10,marginTop:10,marginBottom:10,flexWrap:"wrap"}},
+          h("div",{style:{flex:1,minWidth:140,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #2a2848"}},
+            h("div",{style:{fontSize:10,color:"#7a7a9e",fontWeight:600,textTransform:"uppercase",fontFamily:sm,marginBottom:4,display:"flex",alignItems:"center"}},Ic("sun",12,"#7a7a9e"),"Factor 1: Albedo"),
+            h("div",{style:{fontSize:12,color:"#c0c0d4",lineHeight:1.5}},
+              "Techo oscuro (relleno): albedo ",h("strong",{style:{color:"#f09060"}},"\u2248 0.20"),h("br"),
+              "Techo pintado blanco: albedo ",h("strong",{style:{color:"#e0e0e0"}},"\u2248 0.65"),h("br"),
+              "M\u00e1s reflexi\u00f3n = m\u00e1s luz trasera"
+            )
+          ),
+          h("div",{style:{flex:1,minWidth:140,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #2a2848"}},
+            h("div",{style:{fontSize:10,color:"#7a7a9e",fontWeight:600,textTransform:"uppercase",fontFamily:sm,marginBottom:4,display:"flex",alignItems:"center"}},Ic("trendingUp",12,"#7a7a9e"),"Factor 2: Elevaci\u00f3n"),
+            h("div",{style:{fontSize:12,color:"#c0c0d4",lineHeight:1.5}},
+              "Panel plano sobre el techo: la cara trasera ",h("strong",{style:{color:"#f09060"}},"no ve casi nada"),h("br"),
+              "Panel inclinado y elevado: la cara trasera ",h("strong",{style:{color:"#a0d860"}},"ve cielo y superficie"),h("br"),
+              "Sin elevaci\u00f3n, el bifacial se desperdicia"
+            )
+          )
+        ),
+        h("div",{style:{height:1,background:"#2a2848",margin:"10px 0"}}),
+        h("div",{style:{fontSize:12,fontWeight:700,color:"#a070e0",fontFamily:sm,marginBottom:6,display:"flex",alignItems:"center"}},Ic("barChart",14,"#a070e0"),"Ganancia bifacial real estimada"),
+        h("div",{style:{display:"flex",gap:10,flexWrap:"wrap",marginBottom:10}},
+          h("div",{style:{flex:1,minWidth:100,background:"#0e1420",borderRadius:8,padding:"8px 10px",border:"1px solid #2a2848",textAlign:"center"}},
+            h("div",{style:{fontSize:9,color:"#7a7a9e",fontFamily:sm,marginBottom:2}},"PLANO + OSCURO"),
+            h("div",{style:{fontSize:16,fontWeight:700,color:"#5a6a7e",fontFamily:sm}},"+0.8%"),
+            h("div",{style:{fontSize:9,color:"#4a5a6e"}},"casi nada")
+          ),
+          h("div",{style:{flex:1,minWidth:100,background:"#0e1420",borderRadius:8,padding:"8px 10px",border:"1px solid #2a2848",textAlign:"center"}},
+            h("div",{style:{fontSize:9,color:"#7a7a9e",fontFamily:sm,marginBottom:2}},"PLANO + BLANCO"),
+            h("div",{style:{fontSize:16,fontWeight:700,color:"#8a9aae",fontFamily:sm}},"+2.4%"),
+            h("div",{style:{fontSize:9,color:"#4a5a6e"}},"poco")
+          ),
+          h("div",{style:{flex:1,minWidth:100,background:"#0e1420",borderRadius:8,padding:"8px 10px",border:"1px solid #2a2848",textAlign:"center"}},
+            h("div",{style:{fontSize:9,color:"#7a7a9e",fontFamily:sm,marginBottom:2}},"INCL. + OSCURO"),
+            h("div",{style:{fontSize:16,fontWeight:700,color:"#f09060",fontFamily:sm}},"+5.3%"),
+            h("div",{style:{fontSize:9,color:"#4a5a6e"}},"significativo")
+          ),
+          h("div",{style:{flex:1,minWidth:100,background:"#0e1420",borderRadius:8,padding:"8px 10px",border:"1px solid #2a2848",textAlign:"center"}},
+            h("div",{style:{fontSize:9,color:"#7a7a9e",fontFamily:sm,marginBottom:2}},"INCL. + BLANCO"),
+            h("div",{style:{fontSize:16,fontWeight:700,color:"#a0d860",fontFamily:sm}},"+17.1%"),
+            h("div",{style:{fontSize:9,color:"#4a5a6e"}},"m\u00e1ximo")
+          )
+        ),
+        h("div",{style:{fontSize:13,color:"#a0a0c0",lineHeight:1.6}},
+          Ic("info",14,"#e0e0f0"),h("strong",{style:{color:"#e0e0f0"}},"Dato clave:")," Si ya tienes o vas a comprar paneles bifaciales (los m\u00e1s comunes hoy en Cuba), ponerlos planos sobre un techo oscuro es ",h("strong",{style:{color:"#f09060"}},"subutilizar la tecnolog\u00eda"),". La cara trasera necesita ",h("strong",{style:{color:"#e0e0f0"}},"elevaci\u00f3n")," (m\u00ednimo 30\u201340 cm del techo) y ",h("strong",{style:{color:"#e0e0f0"}},"superficie reflectante")," debajo para funcionar. Pintar el techo de blanco debajo de los paneles es barato y puede aumentar la eficiencia del panel en un ",h("strong",{style:{color:"#a0d860"}},"+17%"),", una diferencia significativa en la producci\u00f3n total del sistema."
+        )
+      ),
+
+      // 15 degrees explanation
+      h("div",{style:{background:"linear-gradient(135deg,#111820,#1a1e28)",border:"1px solid #1e2a3c",borderRadius:14,padding:"16px 20px",marginBottom:18}},
+        h("div",{style:{fontSize:12,fontWeight:700,color:"#f0c040",fontFamily:sm,marginBottom:8,display:"flex",alignItems:"center"}},Ic("wind",14,"#f0c040"),"\u00bfPor qu\u00e9 las granjas solares cubanas usan 15\u00b0 y no 20\u00b0?"),
+        h("div",{style:{fontSize:13,color:"#a0b0c0",lineHeight:1.6}},
+          h("strong",{style:{color:"#e0e6ed"}},"Producci\u00f3n:")," A 15\u00b0 se captura el ",h("strong",{style:{color:"#e0e6ed"}},(BASE.slight15Ratio*100).toFixed(1)+"%")," del \u00f3ptimo. De 0\u00b0 \u2192 15\u00b0: ",h("strong",{style:{color:"#e0e6ed"}},"+"+((BASE.slight15Ratio-BASE.flatRatio)*100).toFixed(1)+"%"),". De 15\u00b0 \u2192 20\u00b0: solo ",h("strong",{style:{color:"#e0e6ed"}},"+"+((1-BASE.slight15Ratio)*100).toFixed(1)+"%")," m\u00e1s."
+        ),
+        h("div",{style:{height:1,background:"#2a3448",margin:"12px 0"}}),
+        h("div",{style:{fontSize:13,color:"#a0b0c0",lineHeight:1.6}},
+          h("strong",{style:{color:"#e0e6ed"}},"Carga de viento en huracanes:")," La fuerza de sustentaci\u00f3n (uplift) es proporcional a sin(\u03b8). Al bajar de 20\u00b0 a 15\u00b0:"
+        ),
+        h("div",{style:{display:"flex",gap:10,marginTop:10,marginBottom:10,flexWrap:"wrap"}},
+          h("div",{style:{flex:1,minWidth:140,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #2a3448"}},
+            h("div",{style:{fontSize:10,color:"#7a8a9e",fontWeight:600,textTransform:"uppercase",fontFamily:sm,marginBottom:4,display:"flex",alignItems:"center"}},Ic("shield",12,"#7a8a9e"),"\u00c1rea proyectada vertical"),
+            h("div",{style:{fontSize:12,color:"#c0cad4",lineHeight:1.5}},
+              "A 20\u00b0: sin(20\u00b0) = ",h("strong",{style:{color:"#f09060"}},"0.342")," del largo",h("br"),"A 15\u00b0: sin(15\u00b0) = ",h("strong",{style:{color:"#a0d860"}},"0.259")," del largo",h("br"),h("strong",{style:{color:"#f0c040"}},"24% menos")," superficie al viento"
+            )
+          ),
+          h("div",{style:{flex:1,minWidth:140,background:"#0e1420",borderRadius:8,padding:"10px 12px",border:"1px solid #2a3448"}},
+            h("div",{style:{fontSize:10,color:"#7a8a9e",fontWeight:600,textTransform:"uppercase",fontFamily:sm,marginBottom:4,display:"flex",alignItems:"center"}},Ic("zap",12,"#7a8a9e"),"Fuerza en hurac\u00e1n Cat 3"),
+            h("div",{style:{fontSize:12,color:"#c0cad4",lineHeight:1.5}},
+              "~200 km/h \u2192 ~1,900 Pa",h("br"),"Panel 2m\u00b2 a 20\u00b0 = ",h("strong",{style:{color:"#f09060"}},"~132 kg"),h("br"),"Panel 2m\u00b2 a 15\u00b0 = ",h("strong",{style:{color:"#a0d860"}},"~100 kg"),h("br"),h("strong",{style:{color:"#f0c040"}},"32 kg menos")," por panel"
+            )
+          )
+        ),
+        h("div",{style:{fontSize:12,color:"#a0b0c0",lineHeight:1.6}},
+          "En hurac\u00e1n Cat 5 (~260 km/h), las fuerzas crecen con el ",h("strong",{style:{color:"#e0e6ed"}},"cuadrado de la velocidad"),". A 20\u00b0: ~",h("strong",{style:{color:"#f09060"}},"220 kg")," por panel. A 15\u00b0: ~",h("strong",{style:{color:"#a0d860"}},"167 kg")," \u2014 ",h("strong",{style:{color:"#f0c040"}},"53 kg menos")," por panel. Con 6 paneles: m\u00e1s de ",h("strong",{style:{color:"#f0c040"}},"300 kg")," de diferencia en lastre."
+        )
+      ),
+
+      // Footer
+      h("div",{style:{fontSize:10,color:"#3a4a5e",textAlign:"center",padding:"0 16px 20px",lineHeight:1.5,fontFamily:dm}},"Datos: "+BASE.source+" para "+BASE.label+". Modelo de azimut para latitudes tropicales (~22\u00b0N). Modelo bifacial: ganancia = albedo \u00d7 bifacialidad (0.75) \u00d7 factor de vista (0.05 plano, 0.35 inclinado elevado).")
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(h(App));
+</script>
+</body>
+</html>
